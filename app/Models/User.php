@@ -31,6 +31,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -66,4 +67,13 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function tickets()
+{
+    return $this->hasMany(Ticket::class);
+}
+
+public function isAdmin()
+{
+    return $this->role === 'admin';
+}
 }
