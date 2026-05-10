@@ -11,18 +11,29 @@ class TicketController extends Controller
 {
     
     public function index()
-    {
-        $query = Ticket::with('user');
+{
+    $query = Ticket::with('user');
 
-        
-        if (auth()->user()->role !== 'admin') {
-            $query->where('user_id', auth()->id());
-        }
-
-        return Inertia::render('Tickets/Index', [
-            'tickets' => $query->latest()->get()
-        ]);
+    if (auth()->user()->role !== 'admin') {
+        $query->where('user_id', auth()->id());
     }
+
+    return Inertia::render('Tickets/Index', [
+        'tickets' => $query->latest()->get(),
+        'auth_user' => auth()->user() 
+    ]);
+    $tickets = Ticket::with('user')->get();
+    
+    return Inertia::render('Tickets/AdminBoard', [
+        'board' => [
+            'open' => $tickets->where('status', 'Open')->values(),
+            'pending' => $tickets->where('status', 'In Progress')->values(),
+            'closed' => $tickets->where('status', 'Closed')->values(),
+        ]
+    ]);
+}
+
+
 public function create()
 {
     return Inertia::render('Tickets/Create');
@@ -52,14 +63,16 @@ public function create()
 
     
     return Inertia::render('Tickets/Show', [
-        'ticket' => $ticket->load(['user', 'comments.user']),
-    ]);
+            'ticket' => $ticket->load(['user', 'comments' => function($query) {
+                $query->orderBy('created_at', 'asc');
+            }, 'comments.user']),
+        ]);
 }
 
 
 public function edit(Ticket $ticket)
 {
- 
+    
     if (auth()->user()->role !== 'admin' && $ticket->user_id !== auth()->id()) {
         abort(403);
     }
@@ -69,7 +82,7 @@ public function edit(Ticket $ticket)
     ]);
 }
 
-// දත්ත Update කිරීම
+
 public function update(Request $request, Ticket $ticket)
 {
     $rules = [
@@ -88,5 +101,16 @@ public function update(Request $request, Ticket $ticket)
     $ticket->update($validated);
 
     return redirect()->route('tickets.index')->with('message', 'Ticket updated successfully.');
+}
+public function destroy(Ticket $ticket)
+{
+   
+if (auth()->user()->role !== 'admin' && $ticket->user_id !== auth()->id()) {
+        abort(403);
+    }
+
+    $ticket->delete();
+
+    return redirect()->route('tickets.index')->with('message', 'Ticket deleted successfully.');
 }
 }

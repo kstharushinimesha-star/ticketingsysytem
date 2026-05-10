@@ -13,7 +13,7 @@ class DatabaseSeeder extends Seeder
         \App\Models\User::factory()->create([
             'name' => 'System Admin',
             'email' => 'admin@test.com',
-            'password' => Hash::make('admin123'), // මෙතැනට ඔබට කැමති password එකක් දෙන්න
+            'password' => Hash::make('admin123'), 
             'role' => 'admin', //[cite: 13, 31]
         ]);
 
@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
         \App\Models\User::factory()->create([
             'name' => 'Normal User',
             'email' => 'user@test.com',
-            'password' => Hash::make('user123'), // මෙතැනට ඔබට කැමති password එකක් දෙන්න
+            'password' => Hash::make('user123'), 
             'role' => 'user',// [cite: 13, 31]
         ]);
     }

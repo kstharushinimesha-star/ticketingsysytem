@@ -17,7 +17,7 @@ class Ticket extends Model
 
     public function comments()
     {
-        // Threaded discussion format එක සඳහා [cite: 18, 36]
+   
         return $this->hasMany(Comment::class)->latest();
     }
 }

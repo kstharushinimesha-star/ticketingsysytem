@@ -6,7 +6,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-// පළමු පිටුව (Welcome Page)
+
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -16,22 +16,24 @@ Route::get('/', function () {
     ]);
 });
 
-// ලොගින් වූ පරිශීලකයින් සඳහා පමණක් (Auth Middleware)
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
 
-   
+   Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [TicketController::class, 'index'])->name('dashboard');
+    
+    Route::get('/admin/board', [TicketController::class, 'index'])->name('admin.board');;
     Route::resource('tickets', TicketController::class);
     Route::post('/tickets/{ticket}/comments', [CommentController::class, 'store'])->name('comments.store');
 
 });
 
+    Route::post('/tickets/{ticket}/comments', [CommentController::class, 'store'])->name('comments.store');
+    Route::patch('/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');
+    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
 
-Route::middleware(['auth', 'admin'])->group(function () {
-Route::get('/tickets/{ticket}/edit', [TicketController::class, 'edit'])->name('tickets.edit');
-Route::put('/tickets/{ticket}', [TicketController::class, 'update'])->name('tickets.update');
 });
